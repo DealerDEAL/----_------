@@ -36,6 +36,7 @@ armor_durability = 100    # Прочность брони
 weapon_broken = False     # Флаг сломанного оружия
 armor_broken = False      # Флаг сломанной брони
 gold = 0                  # Количество золота
+score = 100                 # Количество очков
 
 # Настройка шрифта
 font = pygame.font.Font(None, 36)
@@ -51,6 +52,9 @@ obstacles = {
 
 # Поле восстановления
 recovery_area = pygame.Rect(4 * GRID_SIZE, 4 * GRID_SIZE, GRID_SIZE, GRID_SIZE)  # Пример области восстановления
+
+recovery_area_point = [GRID_SIZE // 10, GRID_SIZE // 10]
+
 
 def draw_grid():
     for x in range(0, WIDTH, GRID_SIZE):
@@ -86,6 +90,9 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
+            score -= 10 
+            if score <= 0:
+                score = 0
             new_pos = player_pos.copy()
             if event.key in (pygame.K_UP, pygame.K_w) and player_pos[1] > 0:
                 new_pos[1] -= 1
@@ -95,16 +102,16 @@ while True:
                 new_pos[0] -= 1
             elif event.key in (pygame.K_RIGHT, pygame.K_d) and player_pos[0] < COLS - 1:
                 new_pos[0] += 1
+                
+                # Проверка нахождения в области восстановления
+            if recovery_area_point == new_pos:
+                player_health = 100
+                weapon_durability = 100   
+                armor_durability = 100
 
             if can_move(new_pos):
                 player_pos = new_pos
                 
-            # Проверка нахождения в области восстановления
-            elif recovery_area.collidepoint(player_pos[1] * GRID_SIZE + GRID_SIZE // 2, player_pos[0] * GRID_SIZE + GRID_SIZE // 2):
-                player_health = 100
-                player_armor = 100
-                player_weapon_durability = 100
-            
             else:
                 # Уменьшение здоровья игрока с учетом защиты и прочности брони
                 damage_taken = 10  # Исходный урон
@@ -145,6 +152,7 @@ while True:
                     if obstacles[obs_position] <= 0:
                         gold_found = random.randint(5, 20)  # Случайное количество золота
                         gold += gold_found
+                        score += 50
                         print(f"Объект на позиции {obs_position} уничтожен! Вы получили {gold_found} золота.")
                         print(f"Текущая сумма золота: {gold}")
 
@@ -157,6 +165,7 @@ while True:
                 # Проверка на победу
                 if check_victory():
                     print("Поздравляем! Вы победили, уничтожив все объекты.")
+                    print("Итоговое количество очков:", score*gold)
                     pygame.quit()
                     sys.exit()
 
@@ -177,12 +186,14 @@ while True:
     armor_text = font.render(f'Прочность брони: {armor_durability}', True, BLACK)
     weapon_text = font.render(f'Прочность оружия: {weapon_durability}', True, BLACK)
     gold_text = font.render(f'Золото: {gold}', True, BLACK)
+    score_text = font.render(f'Очки: {score}', True, BLACK)
 
     # Рендеринг текста на "информационном окне"
     info_window.blit(health_text, (10, 10))
     info_window.blit(armor_text, (10, 50))
     info_window.blit(weapon_text, (10, 90))
     info_window.blit(gold_text, (10, 130))
+    info_window.blit(score_text, (10, 160))
 
     # Отрисовка окна с информацией на основном экране
     screen.blit(info_window, (WIDTH - INFO_WIDTH, 0))

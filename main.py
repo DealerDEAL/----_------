@@ -69,6 +69,10 @@ def draw_obstacles():
     for (x, y), health in obstacles.items():
         if health > 0:  # Отображаем только если здоровье больше 0
             pygame.draw.rect(screen, RED, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+            
+# Отрисовка области восстановления
+def draw_recovery_area():
+    pygame.draw.rect(screen, BLUE, recovery_area)
 
 def draw_fog_of_war():
     for x in range(COLS):
@@ -175,10 +179,9 @@ while True:
     draw_grid()
     draw_obstacles()
     draw_player()
+    draw_recovery_area()
     draw_fog_of_war()
     
-    # Отрисовка области восстановления
-    pygame.draw.rect(screen, BLUE, recovery_area)
     
     # Отрисовка окна с информацией
     info_window.fill(WHITE)

@@ -112,6 +112,7 @@ while True:
                 player_health = 100
                 weapon_durability = 100   
                 armor_durability = 100
+                score += 10
 
             if can_move(new_pos):
                 player_pos = new_pos
